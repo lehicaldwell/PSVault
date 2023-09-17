@@ -1,0 +1,51 @@
+1 - The file psvault.ps1 is NOT signed. To run it as is, you will have to set your execution policy to Unrestricted. This is NOT recommended, as it can leave your system vulnerable to several types of security threats.
+Set-ExecutionPolicy Unrestricted
+
+2 - It is recommended that you run the install script, as it will ensure everything is in place for the script to run properly, and will create a self-signed certificate, sign the script for you, and unblock the necessary files to run properly. 
+
+3 - If you're inclined to set things up yourself, you can use Install-Module to install the dependencies. You'll need to run the following commands to get the required modules.
+
+A. These 2 commands will pull the PoSh Gallery modules and install them.
+    NOTE : You may have to enable/install NuGet to get this to work.
+
+Install-Module Microsoft.PowerShell.SecretManagement
+Install-Module Microsoft.PowerShell.SecretStore
+
+B. It is highly recommended you sign the script so that you don't have to leave your system vulnerable. The below command will create a self-signed cert. These steps are slightly modified from https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_signing?view=powershell-7.3 . It is highly recommended you that you read it.
+
+$params = @{
+    Subject = 'CN=PowerShell Code Signing Cert'
+    Type = 'CodeSigning'
+    CertStoreLocation = 'Cert:\CurrentUser\MyScriptSigningCert'
+    HashAlgorithm = 'sha256'
+}
+$cert = New-SelfSignedCertificate @params
+
+$cert = Get-ChildItem Cert:\CurrentUser\MyScriptSigningCert -CodeSigningCert |
+    Select-Object -First 1
+
+Set-AuthenticodeSignature C:\Where\You\Put\It\PSVault.ps1 $cert
+    NOTE : It is advised to use the absolute path to where you have put PSVault.ps1
+
+C. MicroSoft strongly recommends that you then enable strong protection for your key, as it could be used to sign other PowerShell code so that it can run on your system. 
+
+- To export the certificate:
+
+1 - Start Certificate Manager. (certmgr.exe)
+2 - Select the certificate issued by PowerShell Local Certificate Root.
+3 - Click Export to start the Certificate Export Wizard.
+4 - Select Yes, export the private key, and then click Next.
+5 - Select Enable strong protection.
+6 - Type a password, and then type it again to confirm.
+7 - Type a filename that has the .pfx filename extension.
+8 - Click Finish.
+
+ - To re-import the certificate:
+
+1 - Start Certificate Manager.
+2 - Click Import to start the Certificate Import Wizard.
+3 - Open to the location of the .pfx file that you created during the export process.
+4 - On the Password page, select Enable strong private key protection, and then enter the password that you assigned during the export process.
+5 - Select the Personal certificate store.
+6 - Click Finish.
+
