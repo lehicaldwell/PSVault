@@ -11,7 +11,9 @@ A. These 2 commands will pull the PoSh Gallery modules and install them.
 Install-Module Microsoft.PowerShell.SecretManagement
 Install-Module Microsoft.PowerShell.SecretStore
 
-B. It is highly recommended you sign the script so that you don't have to leave your system vulnerable. The below command will create a self-signed cert. These steps are slightly modified from https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_signing?view=powershell-7.3 . It is highly recommended you that you read it.
+B. It is recommended to place the PSVault.ps1 file in a directory covered by $PATH, so you can simply call the script without having to provide the full path to start the script. 
+
+C. It is highly recommended you sign the script so that you don't have to leave your system vulnerable. The below command will create a self-signed cert. These steps are slightly modified from https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_signing?view=powershell-7.3 . It is highly recommended you that you read it.
 
 $params = @{
     Subject = 'CN=PowerShell Code Signing Cert'
@@ -27,7 +29,7 @@ $cert = Get-ChildItem Cert:\CurrentUser\MyScriptSigningCert -CodeSigningCert |
 Set-AuthenticodeSignature C:\Where\You\Put\It\PSVault.ps1 $cert
     NOTE : It is advised to use the absolute path to where you have put PSVault.ps1
 
-C. MicroSoft strongly recommends that you then enable strong protection for your key, as it could be used to sign other PowerShell code so that it can run on your system. 
+D. MicroSoft strongly recommends that you then enable strong protection for your key, as it could be used to sign other PowerShell code so that it can run on your system. 
 
 - To export the certificate:
 
